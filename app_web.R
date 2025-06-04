@@ -11,10 +11,9 @@ library(sf)
 library(raster)
 
 ##### Accesibilidad Previa
-setwd("C:/Users/SIGEH/Desktop/Lalo/Gob/Extras/Tramites/")
 source("app_web_auxiliars.R")
 
-municipios = sf::read_sf("../../Importantes_documentos_usar/Municipios/municipiosjair.shp")
+municipios = sf::read_sf("Accesibilidad/municipiosjair.shp")
 
 uso_de_suelo=raster("Accesibilidad/uso_de_suelo_friccion.tif")
 pendiente=raster("Accesibilidad/pendiente.tif")
