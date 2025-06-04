@@ -65,6 +65,92 @@ mapa_web = leaflet() |>
 
 mapa_web
 
+library(leaflet)
+library(leaflet.extras)
+library(leaflegend)
+library(leafem)
+
+municipios = sf::read_sf("../../Importantes_documentos_usar/Municipios/municipiosjair.shp")
+mapa_web = leaflet() |> 
+  addTiles() |> 
+  addPolygons(data=municipios |> as("Spatial"),
+              label = municipios$NOM_MUN,fillColor = "gray",fillOpacity = 0.1,color = "white",weight = 1,opacity = 0.4,group = "Municipios") |> 
+  addRasterImage(x = tiempo_zona, colors = viridis::turbo(n = length(min_valor:max_valor), direction = -1, alpha = 0.5)) |> 
+  addLegend(values = c(min_valor:max_valor) , pal = paleta, title = paste0("Tiempo", "<br>","Aproximado"), position = "bottomright",
+            labFormat = labelFormat(
+              between = " – ",
+              suffix = " min",
+              transform = function(x) {x}
+            )) |> 
+  addSearchFeatures(targetGroups = c("Municipios"),
+                    options = searchFeaturesOptions(
+                      zoom = 12,
+                      openPopup = F,
+                      firstTipSubmit =F,initial = F,
+                      hideMarkerOnCollapse =T))|>setView(lng = -98.7591, lat = 20.0511, zoom = 9) |> 
+  addLogo(img = "https://raw.githubusercontent.com/JairEsc/Gob/main/Otros_archivos/imagenes/laboratorio_planeacion.png", position = "bottomleft", src = "remote", width = "399px",height = "80px" )
+
+mapa_web
+
+
+
+
+################################
+### Paleta de colores imagen ###
+################################
+
+my_palette = colorNumeric(
+  palette = viridisLite::turbo(n = length(min_valor:max_valor), direction = -1),
+  domain = values(tiempo_zona),  
+  na.color = "transparent"
+)
+
+colors = turbo(n = length(min_valor:max_valor), direction = -1)
+
+# Crear un data frame para graficar
+df <- data.frame(
+  x = 1:length(colors),
+  y = 1,
+  fill = colors
+)
+
+# Graficar la paleta como barra horizontal
+p = ggplot(df, aes(x = x, y = y, fill = fill)) +
+  geom_tile() +
+  scale_fill_identity() +
+  theme_void() +
+  theme(legend.position = "none",
+        plot.margin = margin(0,0,0,0))
+
+# Guardar como imagen
+ggsave("../../../../paleta_colores.png", plot = p, width = 10, height = 1, dpi = 300)
+
+
+
+
+### Intento
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -98,5 +184,16 @@ unique(values(tiempo_zona)[!is.na(values(tiempo_zona))]) |> lapply(tiempo_estima
 mapa_web = leaflet() |> 
   addTiles() |> 
   addRasterImage(x = tiempo_zona, colors = viridis::turbo(n = length(min_valor:max_valor), direction = -1, alpha = 0.5)) |> 
-  addLegend(values = c("Inmediato", "50min", "1 hora 40 minutos", "5 horas o mas") , pal = paleta_fac, title = paste0("Tiempo", "<br>","Aproximado", "<br>","(Minutos)"), position = "bottomright")
+  addLegend(values = c("Inmediato", "50min", "1 hora 40 minutos", "5 horas o mas") , pal = paleta_fac, title = paste0("Tiempo", "<br>","Aproximado", "<br>","(Minutos)"), position = "bottomright",
+            labFormat = labelFormat(
+              transform = function(x) {
+                # Redondear a horas y agregar "hora(s)"
+                horas <- round(as.numeric(x) / 60)
+                paste0(horas, ifelse(horas == 1, " hora", " horas"))
+              }
+            ))
 mapa_web
+
+
+
+
