@@ -123,14 +123,21 @@ server <- function(input, output, session) {
   # Mostrar mapa
   output$map <- renderLeaflet({
     req(df())
+    print(df())
+    
     if(is.na(st_crs(df()))){
-      df=st_set_crs(df(),value = st_crs("EPSG:4326"))
+      print("is na")
+      df=st_set_crs(df(),value = "EPSG:4326")
+      print("ya na")
+      print(st_crs(df))
+    }else{
+      df=df()
     }
     
-    puntos = df()
+    puntos = df
     puntos=puntos |> st_transform(st_crs(hidalgo))
     coordenadas = sf::st_coordinates(puntos)
-    tiempo_zona = accCost(T.GC, coordenadas)
+    tiempo_zona = accCost(T.GC, coordenadas) 
     raster::crs(tiempo_zona) = crs(hidalgo)
 
     ###Pendiente: Municipio de ubicación.
