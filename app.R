@@ -124,7 +124,7 @@ server <- function(input, output, session) {
   output$map <- renderLeaflet({
     req(df())
     if(is.na(st_crs(df()))){
-      df=st_set_crs(df(),value = )
+      df=st_set_crs(df(),value = st_crs("EPSG:4326"))
     }
     
     puntos = df()
