@@ -3,17 +3,15 @@ library(leaflet)
 library(leaflet.extras)
 library(leaflegend)
 library(leafem)
-#install.packages("archive")
 library(archive)
-#install.packages("DT")
 library(DT)
 library(sf)
 library(raster)
 
-##### Accesibilidad Previa
-setwd("C:/Users/SIGEH/Desktop/Lalo/Gob/Extras/Tramites/")
+### Carga de otro archivo de R
 source("app_web_auxiliars.R")
 
+##### Accesibilidad Previa
 municipios = sf::read_sf("../../Importantes_documentos_usar/Municipios/municipiosjair.shp")
 
 uso_de_suelo=raster("Accesibilidad/uso_de_suelo_friccion.tif")
@@ -40,7 +38,7 @@ library(gdistance)
 Trans = transition(friction, function(x) 1 / mean(x), 8)  # Crea una matriz de transición basada en la fricción.
 T.GC = geoCorrection(Trans, type="c") 
 
-hidalgo=st_read("Accesibilidad/hidalgo/LIM_MUNICIPALES.shp")
+hidalgo= sf::st_read("Accesibilidad/hidalgo/LIM_MUNICIPALES.shp")
 
 
 
@@ -81,7 +79,7 @@ ui <- fluidPage(
                    label = "Arrastra o selecciona tus archivos .shp, .dbf, .shx, .prj, etc. aquí:",
                    buttonLabel = "Click para seleccionar archivos",
                    multiple = TRUE,
-                   accept = c('.shp', ".dbf", ".shx", ".sbx", ".sbn", ".prg", ".rar")
+                   accept = c('.shp', ".dbf", ".shx", ".sbx", ".sbn", ".prg", ".rar", ".zip")
                  ),
                  shiny::tableOutput("files")
              )
@@ -96,7 +94,7 @@ ui <- fluidPage(
 rutina_crear_copias_temporales <- function(inputFiles) {
   temp_dir <- tempfile()
   dir.create(temp_dir)
-  if (!grepl(".rar", inputFiles$datapath[1])) {
+  if (!grepl("\\.(rar|zip)$", inputFiles$datapath[1], ignore.case = TRUE)) {
     for (i in seq_along(inputFiles$name)) {
       file.copy(inputFiles$datapath[i], file.path(temp_dir, inputFiles$name[i]))
     }

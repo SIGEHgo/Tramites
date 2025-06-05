@@ -103,8 +103,8 @@ all(as.numeric(anteriores) %in% ramas_todo)
 
 
 ###
-datos = read.csv("../Extras/Tramites/TramitesCOERG.csv", fileEncoding = "latin1")
-mun = sf::read_sf("../Importantes_documentos_usar/Municipios/municipiosjair.shp")
+datos = read.csv("TramitesCOERG.csv", fileEncoding = "latin1")
+mun = sf::read_sf("../../Importantes_documentos_usar/Municipios/municipiosjair.shp")
 
 nombres = datos |>  dplyr::select(idtram, nombre)
 nombres = unique(nombres)
@@ -117,8 +117,9 @@ limpiar_texto = function(texto) {
     trimws() |>   # quita espacios al inicio y al final
     gsub(pattern = ":", replacement = "") |>
     gsub(pattern = "/", replacement = "") |> 
-    gsub(pattern = " ", replacement = "_")
-  
+    gsub(pattern = " ", replacement = "_") |> 
+    gsub(pattern = "\\.", replacement = "") |> 
+    gsub(pattern = ",", replacement = "_")
 }
 
 for (i in 1:nrow(nombres)) {
@@ -126,7 +127,7 @@ for (i in 1:nrow(nombres)) {
   cat("Vamos en", i, "con nombre de:", nom, "\n")
   interes = datos |>  dplyr::filter(idtram == nombres$idtram[i])
   interes = sf::st_as_sf(x = interes, coords = c("coordenadas_x", "coordenadas_y" ), crs = sf::st_crs(mun))
-  sf::write_sf(interes, paste0("../Extras/Tramites/Tramites shp/", nombres$idtram[i],"_",limpiar_texto(nom),".shp"))
+  sf::write_sf(interes, paste0("Tramites shp/", nombres$idtram[i],"_",limpiar_texto(nom),".shp"))
 }
 
 p = sf::read_sf("../Extras/Tramites/Tramites shp/1717_pago_de_creditos_fiscales_federales_coordinados.shp")
